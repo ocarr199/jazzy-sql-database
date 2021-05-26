@@ -85,17 +85,29 @@ app.get('/artist', (req, res) => {
 
 // SQL DONE
 app.post('/artist', (req, res) => {
-    artistList.push(req.body);
-    res.sendStatus(201);
+    // musicLibrary.push(req.body);
+    // QUERY 
+    // Query Sanitized
+    let queryText =  `INSERT INTO "artist" ("name", "birthdate")
+    VALUES ($1, $2);`
+    let values = [req.body.name, req.body.birthdate]
+    pool.query(queryText, values)
+    .then((result) => {
+        console.log(result.rows);
+        res.sendStatus(201);
+    }).catch( err => {
+        res.sendStatus(500)
+    })
+
 });
 
-app.get('/song', (req, res) => {
-    console.log(`In /songs GET`);
-    res.send(songList);
-});
+// app.get('/song', (req, res) => {
+//     console.log(`In /songs GET`);
+//     res.send(songList);
+// });
 
 app.get('/song', (req, res) => {
-    let queryText = `SELECT * FROM "artist" ORDER BY "birthdate" DESC;`;
+    let queryText = `SELECT * FROM "song" ORDER BY "title" DESC;`;
     pool.query(queryText)
         .then((result) => {
             console.log(result)
@@ -107,4 +119,20 @@ app.get('/song', (req, res) => {
         });
 });
 
+app.post('/artist', (req, res) => {
+    // musicLibrary.push(req.body);
+    // QUERY 
+    // Query Sanitized
+    let queryText =  `INSERT INTO "song" ("title", "length", "released")
+    VALUES ($1, $2, $3);`
+    let values = [req.body.title, req.body.length, req.body.released]
+    pool.query(queryText, values)
+    .then((result) => {
+        console.log(result.rows);
+        res.sendStatus(201);
+    }).catch( err => {
+        res.sendStatus(500)
+    })
+
+});
 
