@@ -27,6 +27,24 @@ app.listen(PORT, () => {
 
 // TODO - Replace static content with a database tables
 
+// const artistList = [ 
+//     {
+//         name: 'Ella Fitzgerald',
+//         birthdate: '04-25-1917'
+//     },
+//     {
+//         name: 'Dave Brubeck',
+//         birthdate: '12-06-1920'
+//     },       
+//     {
+//         name: 'Miles Davis',
+//         birthdate: '05-26-1926'
+//     },
+//     {
+//         name: 'Esperanza Spalding',
+//         birthdate: '10-18-1984'
+//     },
+// ]
 const songList = [
     {
         title: 'Take Five',
@@ -45,18 +63,76 @@ const songList = [
     }
 ];
 
-
+// app.get('/artist', (req, res) => {
+//     console.log(`In /songs GET`);
+//     res.send(artistList);
+// });
 
 // SQL
 
+app.get('/artist', (req, res) => {
+    let queryText = `SELECT * FROM "artist" ORDER BY "birthdate" DESC;`;
+    pool.query(queryText)
+        .then((result) => {
+            console.log(result)
+            res.send(result.rows);
+        })
+        .catch((err) => {
+            console.log(`Error making query ${queryText}`, err);
+            res.sendStatus(500);
+        });
+});
 
+// SQL DONE
+app.post('/artist', (req, res) => {
+    // musicLibrary.push(req.body);
+    // QUERY 
+    // Query Sanitized
+    let queryText =  `INSERT INTO "artist" ("name", "birthdate")
+    VALUES ($1, $2);`
+    let values = [req.body.name, req.body.birthdate]
+    pool.query(queryText, values)
+    .then((result) => {
+        console.log(result.rows);
+        res.sendStatus(201);
+    }).catch( err => {
+        res.sendStatus(500)
+    })
 
-let artistRouter = require("./routes/artist");
-app.use("/artist", artistRouter);
+});
 
+// app.get('/song', (req, res) => {
+//     console.log(`In /songs GET`);
+//     res.send(songList);
+// });
 
-let songRouter = require("./routes/song");
-app.use("/song", songRouter);
+app.get('/song', (req, res) => {
+    let queryText = `SELECT * FROM "song" ORDER BY "title" DESC;`;
+    pool.query(queryText)
+        .then((result) => {
+            console.log(result)
+            res.send(result.rows);
+        })
+        .catch((err) => {
+            console.log(`Error making query ${queryText}`, err);
+            res.sendStatus(500);
+        });
+});
 
+app.post('/song', (req, res) => {
+    // musicLibrary.push(req.body);
+    // QUERY 
+    // Query Sanitized
+    let queryText =  `INSERT INTO "song" ("title", "length", "released")
+    VALUES ($1, $2, $3);`
+    let values = [req.body.title, req.body.length, req.body.released]
+    pool.query(queryText, values)
+    .then((result) => {
+        console.log(result.rows);
+        res.sendStatus(201);
+    }).catch( err => {
+        res.sendStatus(500)
+    })
 
+});
 
